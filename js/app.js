@@ -103,7 +103,7 @@
 
     // textarea 입력 시 전송 버튼 활성화/비활성화 및 글자 수 업데이트
     userInput.addEventListener('input', function () {
-      var text = userInput.value.trim();
+      const text = userInput.value.trim();
       // 텍스트가 있으면 전송 버튼 활성화, 없으면 비활성화
       sendBtn.disabled = text.length === 0;
       // 글자 수 카운터 업데이트
@@ -124,10 +124,10 @@
     if (quickQuestions) {
       quickQuestions.addEventListener('click', function (event) {
         // 클릭된 요소가 .quick-btn 클래스를 가진 버튼인지 확인
-        var btn = event.target.closest('.quick-btn');
+        const btn = event.target.closest('.quick-btn');
         if (btn) {
           // data-question 속성에서 미리 정의된 질문 텍스트를 가져옴
-          var questionText = btn.getAttribute('data-question');
+          const questionText = btn.getAttribute('data-question');
           handleQuickQuestion(questionText);
         }
       });
@@ -143,7 +143,7 @@
    * 입력된 키를 검증하고 localStorage에 저장합니다.
    */
   async function handleSaveApiKey() {
-    var apiKey = apiKeyInput.value.trim();
+    const apiKey = apiKeyInput.value.trim();
 
     // 키가 비어있으면 오류 메시지 표시
     if (!apiKey) {
@@ -157,9 +157,10 @@
 
     try {
       // GeminiAPI 모듈의 유효성 검증 메서드 호출 (파라미터로 키 전달)
-      var isValid = await geminiAPI.validateApiKey(apiKey);
+      // 반환값: { valid: boolean, message: string } 형태의 객체
+      var result = await geminiAPI.validateApiKey(apiKey);
 
-      if (isValid) {
+      if (result.valid) {
         // 검증 성공: API 인스턴스에 키 설정 후 localStorage에 저장
         geminiAPI.setApiKey(apiKey);
         geminiAPI.saveApiKeyToStorage();
@@ -170,8 +171,8 @@
           collapseApiKeySection();
         }, 1000);
       } else {
-        // 검증 실패: 오류 메시지 표시
-        showApiKeyStatus('유효하지 않은 API 키입니다. 다시 확인해주세요.', 'error');
+        // 검증 실패: 서버에서 받은 상세 오류 메시지를 그대로 표시
+        showApiKeyStatus(result.message || '유효하지 않은 API 키입니다.', 'error');
       }
     } catch (error) {
       // 네트워크 오류 등 예외 처리
@@ -224,7 +225,7 @@
     if (!apiKeyToggle || !apiKeyContent) return;
 
     // 현재 상태 확인 (aria-expanded 속성 기반)
-    var isExpanded = apiKeyToggle.getAttribute('aria-expanded') === 'true';
+    const isExpanded = apiKeyToggle.getAttribute('aria-expanded') === 'true';
 
     if (isExpanded) {
       // 열려있으면 → 접기
@@ -249,7 +250,7 @@
     // 이미 전송 중이면 무시 (중복 전송 방지)
     if (isSending) return;
 
-    var message = userInput.value.trim();
+    const message = userInput.value.trim();
 
     // 빈 메시지 무시
     if (!message) return;
@@ -277,7 +278,7 @@
 
     try {
       // GeminiAPI를 통해 AI 응답 요청
-      var response = await geminiAPI.sendMessage(message);
+      const response = await geminiAPI.sendMessage(message);
 
       // AI 응답을 채팅창에 추가
       addAIMessage(response);
@@ -339,7 +340,7 @@
    * @param {string} message - 표시할 사용자 메시지 텍스트
    */
   function addUserMessage(message) {
-    var messageEl = document.createElement('div');
+    const messageEl = document.createElement('div');
     messageEl.className = 'message user-message';
 
     // XSS 방지: textContent를 사용하여 안전하게 삽입
@@ -356,7 +357,7 @@
    * @param {string} message - AI가 반환한 응답 텍스트
    */
   function addAIMessage(message) {
-    var messageEl = document.createElement('div');
+    const messageEl = document.createElement('div');
     messageEl.className = 'message ai-message';
 
     // 텍스트의 줄바꿈(\n)을 <br>로 변환해서 표시
@@ -373,7 +374,7 @@
    * @param {string} message - 표시할 에러 메시지 텍스트
    */
   function addErrorMessage(message) {
-    var messageEl = document.createElement('div');
+    const messageEl = document.createElement('div');
     messageEl.className = 'message error-message';
 
     // XSS 방지: textContent를 사용하여 안전하게 삽입
@@ -397,7 +398,7 @@
    */
   function formatMessage(text) {
     // 1단계: HTML 특수문자 이스케이프 (XSS 방지)
-    var escaped = escapeHtml(text);
+    const escaped = escapeHtml(text);
 
     // 2단계: 줄바꿈 문자(\n)를 HTML <br> 태그로 변환
     return escaped.replace(/\n/g, '<br>');

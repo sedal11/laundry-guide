@@ -20,7 +20,7 @@ class GeminiAPI {
         this.apiKey = apiKey;
 
         // Gemini API 엔드포인트 주소 (고정값)
-        this.apiEndpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+        this.apiEndpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent';
 
         // localStorage에 API 키를 저장할 때 사용할 키 이름
         this.storageKey = 'gemini_api_key';
@@ -57,9 +57,9 @@ class GeminiAPI {
         // 파라미터로 API 키가 전달되면 해당 키를 사용, 없으면 내부 키 사용
         const keyToValidate = apiKey || this.apiKey;
 
-        // 검증할 API 키가 없으면 바로 false 반환
+        // 검증할 API 키가 없으면 에러 메시지와 함께 반환
         if (!keyToValidate) {
-            return false;
+            return { valid: false, message: 'API 키를 입력해주세요.' };
         }
 
         try {
@@ -84,12 +84,31 @@ class GeminiAPI {
             });
 
             // HTTP 상태 코드가 200번대이면 유효한 API 키입니다.
-            return response.ok;
+            if (response.ok) {
+                return { valid: true, message: '' };
+            }
+
+            // 실패 시 API 응답에서 실제 에러 메시지를 가져옵니다.
+            const errorData = await response.json().catch(() => ({}));
+            const serverMessage = errorData?.error?.message || '';
+
+            // 상태 코드별로 사용자에게 알기 쉬운 메시지를 반환합니다.
+            if (response.status === 400) {
+                return { valid: false, message: 'API 키 형식이 올바르지 않습니다. ' + serverMessage };
+            } else if (response.status === 403) {
+                return { valid: false, message: 'API 키 권한이 없습니다. Gemini API가 활성화되어 있는지 확인해주세요.' };
+            } else if (response.status === 404) {
+                return { valid: false, message: '모델을 찾을 수 없습니다. ' + serverMessage };
+            } else if (response.status === 429) {
+                return { valid: false, message: '요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.' };
+            } else {
+                return { valid: false, message: '서버 오류 (' + response.status + '): ' + serverMessage };
+            }
 
         } catch (error) {
-            // 네트워크 오류 등 예외가 발생하면 false 반환
+            // 네트워크 오류 (인터넷 연결 없음, CORS 등)
             console.error('API 키 검증 중 오류 발생:', error);
-            return false;
+            return { valid: false, message: '네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.' };
         }
     }
 
