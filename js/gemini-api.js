@@ -20,7 +20,7 @@ class GeminiAPI {
         this.apiKey = apiKey;
 
         // Gemini API 엔드포인트 주소 (고정값)
-        this.apiEndpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent';
+        this.apiEndpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
         // localStorage에 API 키를 저장할 때 사용할 키 이름
         this.storageKey = 'gemini_api_key';
