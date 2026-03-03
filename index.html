@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <!-- 문자 인코딩 설정 - 한국어 표시를 위해 UTF-8 사용 -->
+    <meta charset="UTF-8" />
+
+    <!-- 반응형 디자인을 위한 뷰포트 설정 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- 검색엔진 최적화(SEO)를 위한 메타 설명 -->
+    <meta
+      name="description"
+      content="AI가 알려주는 세탁 방법 - 소재별 세탁법, 얼룩 제거, 세탁 기호 해석까지"
+    />
+
+    <!-- 브라우저 탭에 표시될 제목 -->
+    <title>세탁 방법을 알려줘 - AI 세탁 도우미</title>
+
+    <!-- 외부 스타일시트 연결 -->
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+    <!-- ============================================
+         헤더 영역: 사이트 제목과 부제목 표시
+         ============================================ -->
+    <header class="site-header">
+      <div class="header-inner">
+        <!-- 사이트 메인 제목 -->
+        <h1 class="site-title">🧺 세탁 방법을 알려줘</h1>
+
+        <!-- 사이트 부제목 -->
+        <p class="site-subtitle">24시간 AI 세탁 도우미</p>
+      </div>
+    </header>
+
+    <!-- ============================================
+         메인 콘텐츠 영역
+         ============================================ -->
+    <main class="main-content">
+      <div class="chat-wrapper">
+
+        <!-- ============================================
+             API 키 설정 영역: 아코디언 스타일로 접기/펼치기 가능
+             사용자가 Gemini API 키를 입력하고 저장하는 곳
+             ============================================ -->
+        <section id="api-key-section" class="api-key-section" aria-label="API 키 설정">
+
+          <!-- 아코디언 토글 버튼 - 클릭하면 설정 영역이 열리고 닫힘 -->
+          <button
+            class="api-key-toggle"
+            id="api-key-toggle"
+            aria-expanded="false"
+            aria-controls="api-key-content"
+            type="button"
+          >
+            <span class="toggle-icon">⚙️</span>
+            <span class="toggle-text">API 키 설정</span>
+            <!-- 화살표 아이콘 - 열림/닫힘 상태에 따라 회전 -->
+            <span class="toggle-arrow" aria-hidden="true">▼</span>
+          </button>
+
+          <!-- 아코디언 콘텐츠 영역 - 기본은 닫힌 상태 -->
+          <div
+            id="api-key-content"
+            class="api-key-content"
+            role="region"
+            aria-labelledby="api-key-toggle"
+          >
+            <div class="api-key-inner">
+              <!-- API 키 안내 문구 -->
+              <p class="api-key-guide">
+                🔑 Gemini API 키를 입력해 주세요.
+                <a
+                  href="https://aistudio.google.com/app/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="api-link"
+                >
+                  API 키 발급받기 →
+                </a>
+              </p>
+
+              <!-- API 키 입력 폼 -->
+              <div class="api-key-form">
+                <!-- API 키 입력 필드 (비밀번호 타입으로 키가 보이지 않게 처리) -->
+                <label for="api-key-input" class="visually-hidden">
+                  Gemini API 키 입력
+                </label>
+                <input
+                  type="password"
+                  id="api-key-input"
+                  class="api-key-input"
+                  placeholder="AIzaSy..."
+                  autocomplete="off"
+                  spellcheck="false"
+                  aria-describedby="api-key-status"
+                />
+
+                <!-- API 키 저장 버튼 -->
+                <button
+                  type="button"
+                  id="save-key-btn"
+                  class="save-key-btn"
+                >
+                  저장
+                </button>
+              </div>
+
+              <!-- API 키 저장 상태 메시지 (성공/오류 메시지 표시) -->
+              <p
+                id="api-key-status"
+                class="api-key-status"
+                role="status"
+                aria-live="polite"
+              ></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================
+             채팅 메시지 컨테이너: AI와 사용자의 대화가 표시되는 영역
+             ============================================ -->
+        <section
+          id="chat-container"
+          class="chat-container"
+          role="log"
+          aria-label="채팅 대화 내용"
+          aria-live="polite"
+        >
+          <!-- 환영 메시지: 페이지 처음 로드 시 기본으로 표시 -->
+          <div class="welcome-message" id="welcome-message">
+            <!-- 환영 아이콘 -->
+            <div class="welcome-icon" aria-hidden="true">🫧</div>
+
+            <!-- 환영 제목 -->
+            <h2 class="welcome-title">안녕하세요!</h2>
+
+            <!-- 환영 설명 -->
+            <p class="welcome-desc">
+              세탁 방법이 궁금하신가요?<br />
+              아래에 질문을 입력하거나<br />
+              빠른 질문 버튼을 눌러보세요 👇
+            </p>
+
+            <!-- 기능 소개 목록 -->
+            <ul class="welcome-features" aria-label="제공 기능 목록">
+              <li>
+                <span aria-hidden="true">👕</span> 소재별 세탁 온도와 방법 안내
+              </li>
+              <li>
+                <span aria-hidden="true">🧴</span> 얼룩 종류별 제거 방법
+              </li>
+              <li>
+                <span aria-hidden="true">🏷️</span> 세탁 기호(라벨) 해석
+              </li>
+              <li>
+                <span aria-hidden="true">🌡️</span> 건조 및 다림질 방법
+              </li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ============================================
+             빠른 질문 버튼 영역: 자주 묻는 질문을 버튼 하나로 바로 질문
+             ============================================ -->
+        <nav
+          id="quick-questions"
+          class="quick-questions"
+          aria-label="빠른 질문 선택"
+        >
+          <p class="quick-questions-label" aria-hidden="true">빠른 질문</p>
+
+          <div class="quick-questions-grid">
+            <!-- 빠른 질문 버튼 1: 면 소재 세탁법 -->
+            <button
+              type="button"
+              class="quick-btn"
+              data-question="면 소재 옷의 올바른 세탁 방법을 알려주세요. 적정 온도와 세탁 시 주의사항도 함께 알려주세요."
+              aria-label="면 소재 세탁법 질문하기"
+            >
+              <span class="quick-btn-icon" aria-hidden="true">👕</span>
+              <span class="quick-btn-text">면 소재 세탁법</span>
+            </button>
+
+            <!-- 빠른 질문 버튼 2: 울/캐시미어 관리 -->
+            <button
+              type="button"
+              class="quick-btn"
+              data-question="울과 캐시미어 소재 의류의 관리 방법을 알려주세요. 세탁, 건조, 보관 방법을 자세히 알려주세요."
+              aria-label="울/캐시미어 관리 방법 질문하기"
+            >
+              <span class="quick-btn-icon" aria-hidden="true">🧶</span>
+              <span class="quick-btn-text">울/캐시미어 관리</span>
+            </button>
+
+            <!-- 빠른 질문 버튼 3: 얼룩 제거 방법 -->
+            <button
+              type="button"
+              class="quick-btn"
+              data-question="옷에 생긴 얼룩을 제거하는 방법을 알려주세요. 음식, 기름, 혈액, 잉크 등 얼룩 종류별로 알려주세요."
+              aria-label="얼룩 제거 방법 질문하기"
+            >
+              <span class="quick-btn-icon" aria-hidden="true">🧴</span>
+              <span class="quick-btn-text">얼룩 제거 방법</span>
+            </button>
+
+            <!-- 빠른 질문 버튼 4: 세탁 기호 의미 -->
+            <button
+              type="button"
+              class="quick-btn"
+              data-question="옷 라벨에 있는 세탁 기호들의 의미를 알려주세요. 세탁, 건조, 다림질, 드라이클리닝 기호를 설명해주세요."
+              aria-label="세탁 기호 의미 질문하기"
+            >
+              <span class="quick-btn-icon" aria-hidden="true">🏷️</span>
+              <span class="quick-btn-text">세탁 기호 의미</span>
+            </button>
+          </div>
+        </nav>
+
+        <!-- ============================================
+             메시지 입력 영역: 사용자가 질문을 직접 타이핑하는 곳
+             ============================================ -->
+        <div class="input-area" role="group" aria-label="메시지 입력">
+
+          <!-- 로딩 인디케이터: AI가 응답을 생성하는 동안 표시 -->
+          <div
+            id="loading-indicator"
+            class="loading-indicator hidden"
+            role="status"
+            aria-label="AI가 답변을 생성 중입니다"
+            aria-live="polite"
+          >
+            <span class="loading-dot" aria-hidden="true"></span>
+            <span class="loading-dot" aria-hidden="true"></span>
+            <span class="loading-dot" aria-hidden="true"></span>
+            <span class="loading-text">답변 생성 중...</span>
+          </div>
+
+          <!-- 입력 폼 컨테이너 -->
+          <div class="input-form">
+            <!-- 사용자 메시지 입력 텍스트에어리어 -->
+            <label for="user-input" class="visually-hidden">
+              세탁 관련 질문 입력
+            </label>
+            <textarea
+              id="user-input"
+              class="user-input"
+              placeholder="세탁 방법이 궁금한 것을 입력해 주세요... (예: 청바지는 어떻게 세탁하나요?)"
+              rows="1"
+              maxlength="1000"
+              aria-label="질문 입력"
+            ></textarea>
+
+            <!-- 메시지 전송 버튼 -->
+            <button
+              type="button"
+              id="send-btn"
+              class="send-btn"
+              aria-label="메시지 전송"
+              disabled
+            >
+              <!-- 전송 아이콘 (SVG 화살표) -->
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                class="send-icon"
+              >
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </div>
+
+          <!-- 입력 글자 수 카운터 -->
+          <p class="char-count" id="char-count" aria-live="polite">
+            <span id="current-chars">0</span>/1000
+          </p>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ============================================
+         푸터 영역: 제작 정보 표시
+         ============================================ -->
+    <footer class="site-footer">
+      <p class="footer-text">
+        <!-- AI 서비스 제공자 표시 -->
+        <span aria-hidden="true">✨</span>
+        Powered by
+        <a
+          href="https://deepmind.google/technologies/gemini/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="footer-link"
+          aria-label="Gemini AI 공식 사이트로 이동"
+        >
+          Gemini AI
+        </a>
+        <span aria-hidden="true">✨</span>
+      </p>
+      <p class="footer-disclaimer">
+        AI 답변은 참고용입니다. 중요한 의류는 전문 세탁소를 이용하세요.
+      </p>
+    </footer>
+
+    <!-- ============================================
+         JavaScript 파일 연결
+         body 끝에 위치시켜 HTML 파싱 후 실행되도록 함
+         ============================================ -->
+
+    <!-- Gemini API 통신을 담당하는 스크립트 -->
+    <script src="js/gemini-api.js"></script>
+
+    <!-- 앱 전체 동작을 담당하는 메인 스크립트 -->
+    <script src="js/app.js"></script>
+  </body>
+</html>
